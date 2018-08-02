@@ -9,6 +9,7 @@ import '@/styles/index.scss' // global css
 
 import App from './App'
 import router from './router'
+import store from './store'
 
 Vue.use(Element, {
   size: 'medium' // set element-ui default size
@@ -23,5 +24,6 @@ import './errorLog' // err log
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 })
