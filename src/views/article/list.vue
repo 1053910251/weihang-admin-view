@@ -1,7 +1,7 @@
 <template>
   <div class="article-container">
     <div class="article-search-container">
-      <el-form class="search-form" ref="searchForm" :inline="true" :model="searchForm" label-width="80px">
+      <el-form class="search-form" ref="searchForm" :inline="true" :model="searchForm" label-width="80px" @submit.native.prevent>
         <el-form-item prop="title" label="文章名称:">
           <el-input name="title" type="text" v-model="searchForm.title"></el-input>
         </el-form-item>
@@ -16,7 +16,7 @@
         <el-table-column label="创建时间" prop="createTime"></el-table-column>
         <el-table-column label="操作">
           <tempalte slot-scope="scope">
-            <el-button @click="showInfo(scope.row)" type="text" size="查看">查看</el-button>
+            <el-button @click="showInfo(scope.row)" type="text">查看</el-button>
           </tempalte>
         </el-table-column>
       </el-table>

@@ -2,7 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 
-import Element from 'element-ui'
+import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import '@/styles/index.scss' // global css
@@ -11,7 +11,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-Vue.use(Element, {
+Vue.use(ElementUI, {
   size: 'medium' // set element-ui default size
 })
 
