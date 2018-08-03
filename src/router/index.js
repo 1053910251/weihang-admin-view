@@ -6,6 +6,7 @@ Vue.use(Router)
 const LayoutComponent = () => import('@/views/layout/layout')
 const LoginComponent = () => import('@/views/login/index')
 const articleListComponent = () => import('@/views/article/list')
+const articleAddComponent = () => import('@/views/article/create')
 const videoListComponent = () => import('@/views/video/list')
 
 /**
@@ -32,6 +33,19 @@ const articleListRoute = {
 }
 
 /**
+ * 添加文章
+ * @type {{path: string, component: function(), name: string, meta: {title: string}}}
+ */
+const articleAddRoute = {
+  path: '/article/add',
+  component: articleAddComponent,
+  name: 'articleAdd',
+  meta: {
+    title: '创建文章'
+  }
+}
+
+/**
  * 文章管理
  * @type {{path: string, component: function(), name: string, redirect: string, children: *[]}}
  */
@@ -44,6 +58,7 @@ const articleRoute = {
     title: '文章管理'
   },
   children: [
+    articleAddRoute,
     articleListRoute
   ]
 }
