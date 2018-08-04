@@ -3,19 +3,13 @@
     <el-form class="form-container" :model="postForm" :rules="rules" ref="postForm">
 
       <sticky :className="'sub-navbar '+postForm.status">
-        <CommentDropdown v-model="postForm.comment_disabled" />
         <PlatformDropdown v-model="postForm.platforms" />
-        <SourceUrlDropdown v-model="postForm.source_uri" />
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">发布
         </el-button>
-        <el-button v-loading="loading" type="warning" @click="draftForm">草稿</el-button>
       </sticky>
 
       <div class="createPost-main-container">
         <el-row>
-
-          <Warning />
-
           <el-col :span="24">
             <el-form-item style="margin-bottom: 40px;" prop="title">
               <MDinput name="name" v-model="postForm.title" required :maxlength="100">
@@ -25,29 +19,14 @@
 
             <div class="postInfo-container">
               <el-row>
-                <el-col :span="8">
-                  <el-form-item label-width="45px" label="作者:" class="postInfo-container-item">
-                    <el-select v-model="postForm.author" filterable remote placeholder="搜索用户" :remote-method="getRemoteUserList">
-                      <el-option v-for="(item,index) in userListOptions" :key="item+index" :label="item" :value="item">
-                      </el-option>
-                    </el-select>
-                  </el-form-item>
-                </el-col>
 
                 <el-col :span="10">
-                  <el-form-item label-width="80px" label="发布时间:" class="postInfo-container-item">
+                  <el-form-item label-width="73px" label="发布时间:" class="postInfo-container-item">
                     <el-date-picker v-model="postForm.display_time" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间">
                     </el-date-picker>
                   </el-form-item>
                 </el-col>
 
-                <el-col :span="6">
-                  <el-form-item label-width="60px" label="重要性:" class="postInfo-container-item">
-                    <el-rate style="margin-top:8px;" v-model="postForm.importance" :max='3' :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :low-threshold="1"
-                      :high-threshold="3">
-                    </el-rate>
-                  </el-form-item>
-                </el-col>
               </el-row>
             </div>
           </el-col>
@@ -63,9 +42,6 @@
           <Tinymce :height=400 ref="editor" v-model="postForm.content" />
         </div>
 
-        <div style="margin-bottom: 20px;">
-          <Upload v-model="postForm.image_uri" />
-        </div>
       </div>
     </el-form>
 
@@ -82,7 +58,6 @@ import Sticky from '@/components/Sticky' // 粘性header组件
 import { validateURL } from '@/utils/validate'
 import { fetchArticle } from '@/api/article'
 import { userSearch } from '@/api/remoteSearch'
-import Warning from './Warning'
 import { CommentDropdown, PlatformDropdown, SourceUrlDropdown } from './Dropdown'
 
 const defaultForm = {
@@ -101,7 +76,7 @@ const defaultForm = {
 
 export default {
   name: 'articleDetail',
-  components: { Tinymce, MDinput, Upload, Multiselect, Sticky, Warning, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
+  components: { Tinymce, MDinput, Upload, Multiselect, Sticky, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
   props: {
     isEdit: {
       type: Boolean,
@@ -115,7 +90,7 @@ export default {
           message: rule.field + '为必传项',
           type: 'error'
         })
-        callback(null)
+        callback('')
       } else {
         callback()
       }
@@ -129,7 +104,7 @@ export default {
             message: '外链url填写不正确',
             type: 'error'
           })
-          callback(null)
+          callback('')
         }
       } else {
         callback()
