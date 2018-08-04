@@ -10,14 +10,14 @@
 
       <el-table-column width="180px" align="center" label="Date">
         <template slot-scope="scope">
-          <span>{{scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
+          <span>{{scope.row.publishTime}}</span>
         </template>
       </el-table-column>
 
       <el-table-column min-width="300px" label="Title">
         <template slot-scope="scope">
 
-          <router-link class="link-type" :to="'/example/edit/'+scope.row.id">
+          <router-link class="link-type" :to="'/article/edit/'+scope.row.id">
             <span>{{ scope.row.title }}</span>
           </router-link>
         </template>
@@ -25,7 +25,7 @@
 
       <el-table-column align="center" label="Actions" width="120">
         <template slot-scope="scope">
-          <router-link :to="'/example/edit/'+scope.row.id">
+          <router-link :to="'/article/edit/'+scope.row.id">
             <el-button type="primary" size="small" icon="el-icon-edit">Edit</el-button>
           </router-link>
         </template>
@@ -74,7 +74,7 @@ export default {
     getList() {
       this.listLoading = false
       this.list = []
-      this.total = []
+      this.total = 100
       // fetchList(this.listQuery).then(response => {
       //   this.list = response.data.items
       //   this.total = response.data.total
