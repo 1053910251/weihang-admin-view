@@ -91,6 +91,7 @@ export default {
         // 跳转路由
         this.$router.push({ path: '/' })
       } catch (e) {
+        this.$message.error('用户名或者密码错误')
         this.loading = false
       }
     }
