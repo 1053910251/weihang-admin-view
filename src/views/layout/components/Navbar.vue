@@ -26,11 +26,6 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <a target='_blank' href="https://github.com/PanJiaChen/vue-element-admin/">
-            <el-dropdown-item>
-              项目地址
-            </el-dropdown-item>
-          </a>
           <el-dropdown-item divided>
             <span @click="logout" style="display:block;">退出登录</span>
           </el-dropdown-item>
@@ -47,6 +42,7 @@ import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import ThemePicker from '@/components/ThemePicker'
+import avatarUrl from '@/assets/avatar.gif'
 
 export default {
   components: {
@@ -59,9 +55,13 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'name',
-      'avatar'
+      'name'
     ])
+  },
+  data() {
+    return {
+      avatar: avatarUrl
+    }
   },
   methods: {
     toggleSideBar() {

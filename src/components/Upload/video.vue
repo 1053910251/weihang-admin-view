@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { ACCESS_TOKEN_HEADER, getToken } from '@/utils/auth'
+  import { ACCESS_TOKEN_HEADER, getAccessToken } from '@/utils/auth'
 
   export default {
     name: 'videoUpload',
@@ -35,7 +35,7 @@
       return {
         tempUrl: '',
         uploadHeaders: {
-          [ACCESS_TOKEN_HEADER]: getToken()
+          [ACCESS_TOKEN_HEADER]: getAccessToken()
         }
       }
     },

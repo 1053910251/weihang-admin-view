@@ -5,7 +5,7 @@ const TOKEN_KEY = 'token'
 export const ACCESS_TOKEN_HEADER = 'Authorization'
 
 export function getToken() {
-  return `Bearer ${Cookies.get(TOKEN_KEY)}`
+  return Cookies.get(TOKEN_KEY)
 }
 
 export function setToken(token) {
@@ -14,4 +14,8 @@ export function setToken(token) {
 
 export function removeToken() {
   return Cookies.remove(TOKEN_KEY)
+}
+
+export function getAccessToken() {
+  return `Bearer ${Cookies.get(TOKEN_KEY)}`
 }

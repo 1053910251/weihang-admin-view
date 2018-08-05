@@ -50,7 +50,7 @@
         your browser does not support the video tag
         <span class="ico ico-sound" :class="{ active: isMute }" v-on:click="closeSoundClick()"></span>
         <span class="ico ico-skip"></span>
-        <span class="ico ico-video" :class="{ hide: isPlay }" v-on:click="playClick()"></span>
+        <span class="el-icon-caret-right" :class="{ hide: isPlay }" v-on:click="playClick()"></span>
       </video>
     </el-dialog>
 

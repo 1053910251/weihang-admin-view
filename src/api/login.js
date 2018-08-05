@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { removeToken } from '@/utils/auth'
 
 export function loginByUsername(username, password) {
   const data = {
@@ -13,7 +14,7 @@ export function loginByUsername(username, password) {
 }
 
 export function logout() {
-  console.log('logout')
+  removeToken()
 }
 
 export function getUserInfo(token) {
