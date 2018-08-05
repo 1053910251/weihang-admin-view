@@ -3,7 +3,7 @@
 
     <div class="search-container">
       <router-link to="/article/add">
-        <el-button type="primary" icon="el-icon-plus">新增文章</el-button>
+        <el-button type="primary" size="small" icon="el-icon-plus">新增文章</el-button>
       </router-link>
     </div>
 

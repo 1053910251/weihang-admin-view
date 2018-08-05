@@ -21,6 +21,7 @@ import SidebarItem from './SidebarItem'
 export default {
   components: { SidebarItem },
   data() {
+    console.log(this.$router['options'].routes)
     return {
       routes: this.$router['options'].routes
     }

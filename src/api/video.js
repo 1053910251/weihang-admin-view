@@ -11,3 +11,14 @@ export function fetchVideo(param) {
     data: param
   })
 }
+
+/**
+ * 删除视频
+ * @param id
+ */
+export function removeVideo(id) {
+  return request({
+    url: `/api/video/${id}`,
+    method: 'delete'
+  })
+}

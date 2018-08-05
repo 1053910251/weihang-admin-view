@@ -1,7 +1,9 @@
 <template>
   <div class="app-container">
 
-    <el-button size="small" type="primary" @click="showUploadDialog">上传视频</el-button>
+    <div class="search-container">
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="showUploadDialog">上传视频</el-button>
+    </div>
     <el-table :data="list" v-loading.body="listLoading" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">
@@ -23,7 +25,12 @@
 
       <el-table-column align="center" label="操作" width="120">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" icon="el-icon-caret-right" @click="playVideo(scope.row)">preview</el-button>
+          <el-button type="primary" size="small" icon="el-icon-caret-right"
+                     @click="playVideo(scope.row)" circle
+          ></el-button>
+          <el-button type="danger" icon="el-icon-delete" circle
+                     @click="deleteVideo(scope.row.id)"
+          ></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -59,7 +66,7 @@
 
 <script>
   import videoUpload from '@/components/Upload/video'
-  import { fetchVideo } from '@/api/video'
+  import { fetchVideo, removeVideo } from '@/api/video'
 
   export default {
     components: {
@@ -94,7 +101,10 @@
       async getList() {
         this.listLoading = true
         try {
-          const result = await fetchVideo()
+          const param = Object.assign(this.listQuery)
+          param.pageNo = param.page
+          param.pageSize = param.limit
+          const result = await fetchVideo(param)
           this.list = result.data.data.list
           this.total = result.data.data.count
         } catch (e) {
@@ -170,6 +180,37 @@
         } else {
           this.muteStatus = 'muted'
         }
+      },
+
+      async deleteVideo(id) {
+        if (!id) {
+          this.$message.error('id not found')
+          return
+        }
+        const action = await new Promise((resolve, reject) => {
+          this.$confirm('是否删除这个视频，不可恢复', '删除视频', {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '确认',
+            cancelButtonText: '取消'
+          })
+            .then(() => {
+              resolve('confirm')
+            })
+            .catch(action => {
+              resolve(action)
+            })
+        })
+        if (action === 'confirm') {
+          try {
+            await removeVideo(id)
+            await this.getList()
+            this.$message.info('删除成功')
+          } catch (e) {
+            console.log(e)
+            this.$message.error('删除失败')
+          }
+        }
+        console.log(action)
       }
     }
   }
@@ -179,6 +220,12 @@
   .edit-input {
     padding-right: 100px;
   }
+
+  .search-container {
+    margin-bottom: 10px;
+    float: right;
+  }
+
   .cancel-btn {
     position: absolute;
     right: 15px;
