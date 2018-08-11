@@ -43,11 +43,11 @@
       rmImage() {
         this.emitInput('')
       },
-      emitInput(val) {
-        this.$emit('input', val)
+      emitSuccess(res) {
+        this.$emit('upload-success', res)
       },
       handleUploadSuccess(res) {
-        console.log(res)
+        this.emitSuccess(res)
       },
       beforeUpload(file) {
         const isLt10M = file.size / (1024 * 1024) < 10

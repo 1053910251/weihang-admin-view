@@ -8,7 +8,7 @@ export function fetchVideo(param) {
   return request({
     url: '/api/video',
     method: 'get',
-    data: param
+    params: param
   })
 }
 
@@ -20,5 +20,18 @@ export function removeVideo(id) {
   return request({
     url: `/api/video/${id}`,
     method: 'delete'
+  })
+}
+
+/**
+ * 修改视频状态
+ * @param id
+ * @param param
+ */
+export function updateVideo(id, param) {
+  return request({
+    url: `/api/video/${id}`,
+    method: 'put',
+    data: param
   })
 }

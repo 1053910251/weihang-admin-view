@@ -1,8 +1,17 @@
 <template>
   <div class="app-container">
 
-    <div class="search-container">
-      <el-button type="primary" size="small" icon="el-icon-plus" @click="showUploadDialog">上传视频</el-button>
+    <div class="filter-container">
+      <el-input class="filter-item" style="width: 200px;" v-model="listQuery.title" placeholder="视频名称"></el-input>
+      <el-select class="filter-item" v-model="listQuery.state" clearable>
+        <el-option v-for="item in stateOptions"
+                   :key="item.value"
+                   :label="item.label"
+                   :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="getList">查询</el-button>
+      <el-button class="filter-item" style="float: right" type="primary" size="small" icon="el-icon-upload2" @click="showUploadDialog">上传视频</el-button>
     </div>
     <el-table :data="list" v-loading.body="listLoading" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
@@ -13,7 +22,13 @@
 
       <el-table-column width="200px" align="center" label="上传时间">
         <template slot-scope="scope">
-          <span>{{scope.row.createTime}}</span>
+          <span>{{scope.row.createTime | formatDate()}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="120px" align="center" label="状态">
+        <template slot-scope="scope">
+          <span>{{stateMap[scope.row.state].label || ''}}</span>
         </template>
       </el-table-column>
 
@@ -23,10 +38,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" width="120">
+      <el-table-column align="center" label="操作" width="160">
         <template slot-scope="scope">
           <el-button type="primary" size="small" icon="el-icon-caret-right"
                      @click="playVideo(scope.row)" circle
+          ></el-button>
+          <el-button type="primary" icon="el-icon-check" circle
+                     v-if="scope.row.state === 1"
+                     @click="auditConfirm(scope.row.id)"
           ></el-button>
           <el-button type="danger" icon="el-icon-delete" circle
                      @click="deleteVideo(scope.row.id)"
@@ -36,8 +55,8 @@
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="listQuery.page"
-                     :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="listQuery.pageNo"
+                     :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
 
@@ -46,18 +65,15 @@
       :visible.sync="dialogVisible"
       width="30%"
       center>
-      <video-upload></video-upload>
+      <video-upload @upload-success="uploadSuccess"></video-upload>
     </el-dialog>
 
     <el-dialog
       title="播放视频"
       :visible.sync="playDialogVisible"
     >
-      <video :src="videoUrl" :muted="muteStatus" :autoplay="playStatus" height="400" width="100%">
+      <video :src="videoUrl" height="400" width="100%" controls>
         your browser does not support the video tag
-        <span class="ico ico-sound" :class="{ active: isMute }" v-on:click="closeSoundClick()"></span>
-        <span class="ico ico-skip"></span>
-        <span class="el-icon-caret-right" :class="{ hide: isPlay }" v-on:click="playClick()"></span>
       </video>
     </el-dialog>
 
@@ -66,7 +82,7 @@
 
 <script>
   import videoUpload from '@/components/Upload/video'
-  import { fetchVideo, removeVideo } from '@/api/video'
+  import { fetchVideo, removeVideo, updateVideo } from '@/api/video'
 
   export default {
     components: {
@@ -74,6 +90,13 @@
     },
     name: 'videoList',
     data() {
+      const stateOptions = [{
+        label: '待审核',
+        value: '1'
+      }, {
+        label: '已审核',
+        value: '2'
+      }]
       return {
         uploadUrl: '/api/video',
         videoFlag: false, // 是否上传
@@ -82,16 +105,19 @@
         total: 0,
         listLoading: true,
         listQuery: {
-          page: 1,
-          limit: 10
+          pageNo: 1,
+          pageSize: 10,
+          title: '',
+          state: ''
         },
+        stateOptions,
+        stateMap: stateOptions.reduce((prev, next) => {
+          prev[next.value] = next
+          return prev
+        }, {}),
         dialogVisible: false,
         playDialogVisible: false,
-        videoUrl: '',
-        isMute: true,
-        isPlay: false,
-        playStatus: '',
-        muteStatus: ''
+        videoUrl: ''
       }
     },
     async created() {
@@ -102,8 +128,6 @@
         this.listLoading = true
         try {
           const param = Object.assign(this.listQuery)
-          param.pageNo = param.page
-          param.pageSize = param.limit
           const result = await fetchVideo(param)
           this.list = result.data.data.list
           this.total = result.data.data.count
@@ -128,34 +152,22 @@
        * @returns {boolean}
        */
       beforeUploadVideo(file) {
-        const isLt10M = file.size / (1024 * 1024) < 10
+        const isLt10M = file.size / (1024 * 1024) < 50
         if (['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb'].indexOf(file.type) === -1) {
           this.$message.error('请上传正确的视频格式')
           return false
         }
         if (!isLt10M) {
-          this.$message.error('上传视频大小不能超过10MB哦!')
+          this.$message.error('上传视频大小不能超过50MB哦!')
           return false
         }
       },
-      /**
-       * 上传进度
-       * @param event
-       * @param file
-       * @param fileList
-       */
-      uploadVideoProcess(event, file, fileList) {
-        this.videoFlag = true
-        this.videoUploadPercent = file.percentage.toFixed(0)
-      },
-
       /**
        * 展示弹窗
        */
       showUploadDialog() {
         this.dialogVisible = true
       },
-
       /**
        * 播放视频
        */
@@ -167,21 +179,9 @@
         this.playDialogVisible = true
         this.videoUrl = row.path
       },
-
-      playClick() {
-        this.isPlay = !this.isPlay
-        this.playStatus = 'autoplay'
-      },
-
-      closeSoundClick() {
-        this.isMute = !this.isMute
-        if (this.isMute) {
-          this.muteStatus = ''
-        } else {
-          this.muteStatus = 'muted'
-        }
-      },
-
+      /**
+       * 删除视频
+       */
       async deleteVideo(id) {
         if (!id) {
           this.$message.error('id not found')
@@ -211,6 +211,39 @@
           }
         }
         console.log(action)
+      },
+
+      /**
+       * 上传成功
+       * @param res
+       */
+      async uploadSuccess(res) {
+        console.log(res)
+        this.$message.success('上传成功')
+        this.dialogVisible = false
+        await this.getList()
+      },
+
+      /**
+       * 审核通过
+       * @returns {Promise<void>}
+       */
+      async auditConfirm(id) {
+        let message = ''
+        try {
+          await updateVideo(id, { state: 2 })
+          message = '审核通过'
+        } catch (e) {
+          console.log(e)
+          message = '审核失败'
+        }
+        this.$notify({
+          title: '成功',
+          message,
+          type: 'success',
+          duration: 2000
+        })
+        await this.getList()
       }
     }
   }

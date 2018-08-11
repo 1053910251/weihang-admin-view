@@ -8,7 +8,7 @@ export function fetchArticle(param) {
   return request({
     url: '/api/article',
     method: 'get',
-    data: param
+    params: param
   })
 }
 

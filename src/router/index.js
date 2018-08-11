@@ -10,6 +10,8 @@ const articleListComponent = () => import('@/views/article/list')
 const articleAddComponent = () => import('@/views/article/create')
 const articleEditComponent = () => import('@/views/article/edit')
 const videoListComponent = () => import('@/views/video/list')
+const JobListComponent = () => import('@/views/job/list')
+const TagListComponent = () => import('@/views/tag/list')
 
 // 首页
 const dashboardRoute = {
@@ -119,11 +121,61 @@ const videoRoute = {
   ]
 }
 
+const jobListRoute = {
+  path: '/job/list',
+  component: JobListComponent,
+  name: 'jobList',
+  meta: {
+    title: '岗位列表'
+  }
+}
+
+/**
+ * 职位管理
+ * @type {{path: string, component: function(), name: string, redirect: string, meta: {title: string}, children: Array}}
+ */
+const jobRoute = {
+  path: '/job',
+  component: LayoutComponent,
+  name: 'job',
+  redirect: '/job/list',
+  meta: {
+    title: '岗位管理'
+  },
+  children: [
+    jobListRoute
+  ]
+}
+
+const tagListRoute = {
+  path: '/tag/list',
+  component: TagListComponent,
+  name: 'tagList',
+  meta: {
+    title: '标签列表'
+  }
+}
+
+const tagRoute = {
+  path: '/tag',
+  component: LayoutComponent,
+  name: 'tag',
+  redirect: '/tag/list',
+  meta: {
+    title: '标签管理'
+  },
+  children: [
+    tagListRoute
+  ]
+}
+
 export const routes = [
   dashboardRoute,
   loginRoute,
   articleRoute,
-  videoRoute
+  videoRoute,
+  jobRoute,
+  tagRoute
 ]
 
 const router = new Router({

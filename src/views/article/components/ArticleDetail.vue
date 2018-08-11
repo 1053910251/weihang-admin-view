@@ -6,6 +6,7 @@
         <!--<PlatformDropdown v-model="postForm.platforms"/>-->
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">发布
         </el-button>
+        <el-button v-if="postForm.state === 1" v-loading="loading" style="margin-left: 10px;" type="success" @click="auditConfirm">审核通过</el-button>
       </sticky>
 
       <div class="createPost-main-container">
@@ -20,11 +21,23 @@
             <div class="postInfo-container">
               <el-row>
 
-                <el-col :span="10">
+                <el-col :span="6">
                   <el-form-item label-width="73px" label="发布时间:" class="postInfo-container-item">
                     <el-date-picker v-model="postForm.publishTime" type="date" format="yyyy-MM-dd HH:mm:ss"
                                     value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间">
                     </el-date-picker>
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="8">
+                  <el-form-item label-width="73px" label="状态:" class="postInfo-container-item">
+                    <el-select v-model="postForm.state" clearable>
+                      <el-option v-for="item in stateOptions"
+                                 :key="item.value"
+                                 :label="item.label"
+                                 :value="item.value">
+                      </el-option>
+                    </el-select>
                   </el-form-item>
                 </el-col>
 
@@ -71,6 +84,14 @@
     platforms: ['a-platform']
   }
 
+  const stateOptions = [{
+    label: '待审核',
+    value: '1'
+  }, {
+    label: '已审核',
+    value: '2'
+  }]
+
   export default {
     name: 'articleDetail',
     components: { Tinymce, MDinput, Upload, Multiselect, Sticky, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
@@ -100,7 +121,8 @@
           imageUrl: [{ validator: validateRequire }],
           title: [{ validator: validateRequire }],
           content: [{ validator: validateRequire }]
-        }
+        },
+        stateOptions
       }
     },
     computed: {
@@ -122,6 +144,7 @@
         try {
           const result = await findArticleById(id)
           this.postForm = result.data.data
+          this.postForm.state = this.postForm.state ? `${this.postForm.state}` : ''
         } catch (e) {
           console.log(e)
           this.$message.error('拉去数据失败')
@@ -129,7 +152,6 @@
         this.loading = false
       },
       async submitForm() {
-        console.log(this.postForm)
         const valid = await new Promise((resolve, reject) => {
           this.$refs.postForm.validate(valid => resolve(valid))
         })
@@ -158,6 +180,27 @@
           console.log(e)
         }
         this.loading = false
+      },
+
+      /**
+       * 审核通过
+       * @returns {Promise<void>}
+       */
+      async auditConfirm() {
+        let message = ''
+        try {
+          await updateArticle(this.postForm.id, { state: 2 })
+          message = '审核通过'
+        } catch (e) {
+          console.log(e)
+          message = '审核失败'
+        }
+        this.$notify({
+          title: '成功',
+          message,
+          type: 'success',
+          duration: 2000
+        })
       }
     }
   }

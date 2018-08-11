@@ -1,9 +1,18 @@
 <template>
   <div class="app-container">
 
-    <div class="search-container">
+    <div class="filter-container">
+      <el-input class="filter-item" style="width: 200px;" v-model="listQuery.title" placeholder="文章标题"></el-input>
+      <el-select class="filter-item" v-model="listQuery.state" clearable>
+        <el-option v-for="item in stateOptions"
+                   :key="item.value"
+                   :label="item.label"
+                   :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
       <router-link to="/article/add">
-        <el-button type="primary" size="small" icon="el-icon-plus">新增文章</el-button>
+        <el-button class="filter-item" style="float: right" type="primary" size="small" icon="el-icon-plus">新增文章</el-button>
       </router-link>
     </div>
 
@@ -17,6 +26,12 @@
       <el-table-column width="180px" align="center" label="发布日期">
         <template slot-scope="scope">
           <span>{{scope.row.publishTime | formatDate()}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="120px" align="center" label="状态">
+        <template slot-scope="scope">
+          <span>{{stateMap[scope.row.state].label || ''}}</span>
         </template>
       </el-table-column>
 
@@ -43,8 +58,8 @@
 
     <div class="pagination-container">
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                     :current-page="listQuery.page"
-                     :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit"
+                     :current-page="listQuery.pageNo"
+                     :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize"
                      layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
@@ -58,14 +73,28 @@
   export default {
     name: 'articleList',
     data() {
+      const stateOptions = [{
+        label: '待审核',
+        value: '1'
+      }, {
+        label: '已审核',
+        value: '2'
+      }]
       return {
         list: null,
         total: 0,
         listLoading: true,
         listQuery: {
-          page: 1,
-          limit: 10
-        }
+          pageNo: 1,
+          pageSize: 10,
+          title: '',
+          state: ''
+        },
+        stateOptions,
+        stateMap: stateOptions.reduce((prev, next) => {
+          prev[next.value] = next
+          return prev
+        }, {})
       }
     },
     filters: {
@@ -85,9 +114,8 @@
       async getList() {
         this.listLoading = true
         try {
-          const param = Object.assign(this.listQuery)
-          param.pageNo = param.page
-          param.pageSize = param.limit
+          const param = Object.assign({}, this.listQuery)
+          console.log(param)
           const result = await fetchArticle(param)
           this.list = result.data.data.list
           this.total = result.data.data.count
@@ -135,6 +163,9 @@
           }
         }
         console.log(action)
+      },
+      async handleSearch() {
+        await this.getList()
       }
     }
   }
