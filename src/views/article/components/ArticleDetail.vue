@@ -6,7 +6,7 @@
         <!--<PlatformDropdown v-model="postForm.platforms"/>-->
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">发布
         </el-button>
-        <el-button v-if="postForm.state === 1" v-loading="loading" style="margin-left: 10px;" type="success" @click="auditConfirm">审核通过</el-button>
+        <el-button v-if="postForm.state === 1 && postForm.id" v-loading="loading" style="margin-left: 10px;" type="success" @click="auditConfirm">审核通过</el-button>
       </sticky>
 
       <div class="createPost-main-container">
@@ -21,7 +21,7 @@
             <div class="postInfo-container">
               <el-row>
 
-                <el-col :span="6">
+                <el-col :span="8">
                   <el-form-item label-width="73px" label="发布时间:" class="postInfo-container-item">
                     <el-date-picker v-model="postForm.publishTime" type="date" format="yyyy-MM-dd HH:mm:ss"
                                     value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间">
@@ -81,15 +81,15 @@
     imageUrl: '', // 文章图片
     publishTime: undefined, // 前台展示时间
     id: undefined,
-    platforms: ['a-platform']
+    state: 1
   }
 
   const stateOptions = [{
     label: '待审核',
-    value: '1'
+    value: 1
   }, {
     label: '已审核',
-    value: '2'
+    value: 2
   }]
 
   export default {
@@ -144,7 +144,6 @@
         try {
           const result = await findArticleById(id)
           this.postForm = result.data.data
-          this.postForm.state = this.postForm.state ? `${this.postForm.state}` : ''
         } catch (e) {
           console.log(e)
           this.$message.error('拉去数据失败')
@@ -161,6 +160,7 @@
         this.loading = true
         let message = ''
         try {
+          this.postForm.articleType = 1
           if (this.postForm.id) {
             await updateArticle(this.postForm.id, this.postForm)
             message = '修改文章成功'

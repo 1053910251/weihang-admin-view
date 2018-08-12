@@ -18,6 +18,10 @@ module.exports = {
       '/video/*': {
         target: 'http://127.0.0.1:3000',
         secure: false
+      },
+      '/img/*': {
+        target: 'http://127.0.0.1:3000',
+        secure: false
       }
     },
 
