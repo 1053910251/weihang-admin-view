@@ -53,6 +53,12 @@
           <span class="word-counter" v-show="summaryLength">{{summaryLength}}字</span>
         </el-form-item>
 
+        <el-form-item style="margin-bottom: 40px;" label-width="73px" label="文章封面:">
+          <single-image color="#1890ff" class="editor-upload-btn"
+                        :value="postForm.articleImage"
+                        @upload-success="imageSuccessCBK"></single-image>
+        </el-form-item>
+
         <div class="editor-container">
           <Tinymce :height=400 ref="editor" v-model="postForm.content"/>
         </div>
@@ -65,7 +71,7 @@
 
 <script>
   import Tinymce from '@/components/Tinymce'
-  import Upload from '@/components/Upload/singleImage3'
+  import SingleImage from '@/components/Upload/singleImage'
   import MDinput from '@/components/MDinput'
   import Multiselect from 'vue-multiselect'// 使用的一个多选框组件，element-ui的select不能满足所有需求
   import 'vue-multiselect/dist/vue-multiselect.min.css'// 多选框组件css
@@ -78,7 +84,7 @@
     title: '', // 文章题目
     content: '', // 文章内容
     summary: '', // 文章摘要
-    imageUrl: '', // 文章图片
+    articleImage: '', // 文章图片
     publishTime: undefined, // 前台展示时间
     id: undefined,
     state: 1
@@ -94,7 +100,7 @@
 
   export default {
     name: 'articleDetail',
-    components: { Tinymce, MDinput, Upload, Multiselect, Sticky, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
+    components: { Tinymce, MDinput, SingleImage, Multiselect, Sticky, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
     props: {
       isEdit: {
         type: Boolean,
@@ -201,6 +207,12 @@
           type: 'success',
           duration: 2000
         })
+      },
+      /**
+       * 上传文章封面成功的回调
+       */
+      imageSuccessCBK(path) {
+        this.postForm.articleImage = path
       }
     }
   }
