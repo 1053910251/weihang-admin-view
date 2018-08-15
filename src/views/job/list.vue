@@ -31,6 +31,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column align="center" label="工作经验/学历">
+        <template slot-scope="scope">
+          <span>{{scope.row.experience}}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column align="center" label="职位描述">
         <template slot-scope="scope">
           <span>{{scope.row.desc}}</span>
@@ -72,13 +78,17 @@
       center
       @close="closeDialog"
     >
-      <el-form :model="postForm" :rules="rules" ref="postForm" label-width="80px" size="mini">
+      <el-form :model="postForm" :rules="rules" ref="postForm" label-width="110px" size="mini">
         <el-form-item label="职位名称" prop="jobName">
           <el-input v-model="postForm.jobName"></el-input>
         </el-form-item>
 
+        <el-form-item label="工作经验/学历" prop="experience">
+          <el-input v-model="postForm.experience" placeholder="工作经验/学历"></el-input>
+        </el-form-item>
+
         <el-form-item label="职位描述" prop="desc">
-          <el-input type="textarea" v-model="postForm.desc"></el-input>
+          <el-input type="textarea" v-model="postForm.desc" autosize></el-input>
         </el-form-item>
 
         <el-form-item label="职位标签" prop="tagId">
@@ -127,6 +137,7 @@
         postForm: {
           id: null,
           jobName: '',
+          experience: '',
           desc: '',
           tagId: ''
         },
@@ -134,6 +145,11 @@
           jobName: [{
             required: true,
             message: '请输入职位名称',
+            trigger: 'blur'
+          }],
+          experience: [{
+            required: true,
+            message: '请输入工作经验/学历',
             trigger: 'blur'
           }],
           desc: [{
