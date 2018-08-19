@@ -10,7 +10,7 @@
         </el-option>
       </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="getList">查询</el-button>
-      <el-button class="filter-item" style="float: right" type="primary" size="small" icon="el-icon-plus" @click="dialogVisible=true">创建标签</el-button>
+      <el-button class="filter-item" style="float: right" type="primary" size="small" icon="el-icon-plus" @click="dialogVisible=true">创建职位</el-button>
     </div>
     <el-table :data="list" v-loading.body="listLoading" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
