@@ -1,8 +1,8 @@
 <template>
   <div class="upload-container">
     <el-upload
-      class="image-uploader"
-      action="/api/video"
+      class="video-uploader"
+      action="/api/upload/video"
       drag
       :multiple="false"
       :show-file-list="false"
@@ -10,11 +10,22 @@
       :before-upload="beforeUpload"
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
+      v-loading="loading"
+      v-show="!value.length"
     >
-
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
     </el-upload>
+    <div class="video-preview" v-show="value.length>1">
+      <div class="video-preview-wrapper">
+        <video :src="videoUrl" height="100" width="100%">
+          your browser does not support the video tag
+        </video>
+        <div class="video-preview-action">
+          <i @click="rmVideo" class="el-icon-delete"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,16 +38,16 @@
       value: String
     },
     computed: {
-      imageUrl() {
+      videoUrl() {
         return this.value
       }
     },
     data() {
       return {
-        tempUrl: '',
         uploadHeaders: {
           [ACCESS_TOKEN_HEADER]: getAccessToken()
-        }
+        },
+        loading: false
       }
     },
     methods: {
@@ -47,7 +58,8 @@
         this.$emit('upload-success', res)
       },
       handleUploadSuccess(res) {
-        this.emitSuccess(res)
+        this.loading = false
+        this.emitSuccess(res.data.path || '')
       },
       beforeUpload(file) {
         const isLt10M = file.size / (1024 * 1024) < 100
@@ -59,9 +71,14 @@
           this.$message.error('上传视频大小不能超过100MB哦!')
           return false
         }
+        this.loading = true
       },
       handleUploadError() {
+        this.loading = false
         this.$message.error('上传失败')
+      },
+      rmVideo() {
+        this.emitSuccess('')
       }
     }
   }
@@ -73,18 +90,15 @@
     width: 100%;
     position: relative;
     @include clearfix;
-    .image-uploader {
+    .video-uploader {
       width: 100%;
       float: left;
     }
-    .image-preview {
-      width: 200px;
-      height: 200px;
+    .video-preview {
       position: relative;
       border: 1px dashed #d9d9d9;
       float: left;
-      margin-left: 50px;
-      .image-preview-wrapper {
+      .video-preview-wrapper {
         position: relative;
         width: 100%;
         height: 100%;
@@ -93,7 +107,7 @@
           height: 100%;
         }
       }
-      .image-preview-action {
+      .video-preview-action {
         position: absolute;
         width: 100%;
         height: 100%;
@@ -114,25 +128,9 @@
         }
       }
       &:hover {
-        .image-preview-action {
+        .video-preview-action {
           opacity: 1;
         }
-      }
-    }
-    .image-app-preview {
-      width: 320px;
-      height: 180px;
-      position: relative;
-      border: 1px dashed #d9d9d9;
-      float: left;
-      margin-left: 50px;
-      .app-fake-conver {
-        height: 44px;
-        position: absolute;
-        width: 100%; // background: rgba(0, 0, 0, .1);
-        text-align: center;
-        line-height: 64px;
-        color: #fff;
       }
     }
   }

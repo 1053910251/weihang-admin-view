@@ -4,7 +4,9 @@
                :headers="headers"
                :multiple="false"
                :show-file-list="false"
-               :on-success="handleImageSuccess">
+               :on-success="handleImageSuccess"
+               v-show="!imageUrl.length"
+    >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
     </el-upload>
@@ -54,7 +56,7 @@
   }
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
+<style rel="stylesheet/scss" lang="scss">
 @import "src/styles/mixin.scss";
 .upload-container {
   width: 100%;
@@ -104,22 +106,6 @@
       .image-preview-action {
         opacity: 1;
       }
-    }
-  }
-  .image-app-preview {
-    width: 320px;
-    height: 180px;
-    position: relative;
-    border: 1px dashed #d9d9d9;
-    float: left;
-    margin-left: 50px;
-    .app-fake-conver {
-      height: 44px;
-      position: absolute;
-      width: 100%; // background: rgba(0, 0, 0, .1);
-      text-align: center;
-      line-height: 64px;
-      color: #fff;
     }
   }
 }

@@ -35,3 +35,15 @@ export function updateVideo(id, param) {
     data: param
   })
 }
+
+/**
+ * 上传视频
+ * @param param
+ */
+export function createVideo(param) {
+  return request({
+    url: '/api/video',
+    method: 'post',
+    data: param
+  })
+}

@@ -63,9 +63,28 @@
     <el-dialog
       title="上传视频"
       :visible.sync="dialogVisible"
+      @close="closeDialog"
       width="30%"
       center>
-      <video-upload @upload-success="uploadSuccess"></video-upload>
+      <el-form :model="postForm" :rules="rules" ref="postForm" label-width="110px" size="mini">
+        <el-form-item label="视频封面" prop="imageUrl">
+          <single-image color="#1890ff" class="editor-upload-btn"
+                        :value="postForm.imageUrl"
+                        @upload-success="imageSuccessCBK"></single-image>
+        </el-form-item>
+
+        <el-form-item label="视频名称" prop="title">
+          <el-input v-model="postForm.title"></el-input>
+        </el-form-item>
+
+        <el-form-item label="上传视频" prop="path">
+          <video-upload @upload-success="uploadSuccess" :value="postForm.path"></video-upload>
+        </el-form-item>
+
+        <el-form-item center>
+          <el-button type="primary" @click="saveVideo">保存</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
 
     <el-dialog
@@ -82,11 +101,13 @@
 
 <script>
   import videoUpload from '@/components/Upload/video'
-  import { fetchVideo, removeVideo, updateVideo } from '@/api/video'
+  import { fetchVideo, removeVideo, updateVideo, createVideo } from '@/api/video'
+  import SingleImage from '@/components/Upload/singleImage'
 
   export default {
     components: {
-      videoUpload
+      videoUpload,
+      SingleImage
     },
     name: 'videoList',
     data() {
@@ -117,7 +138,29 @@
         }, {}),
         dialogVisible: false,
         playDialogVisible: false,
-        videoUrl: ''
+        videoUrl: '',
+        postForm: {
+          imageUrl: '',
+          title: '',
+          path: ''
+        },
+        rules: {
+          imageUrl: [{
+            required: true,
+            message: '请上传视频封面',
+            trigger: 'blur'
+          }],
+          title: [{
+            required: true,
+            message: '请输入视频名称',
+            trigger: 'blur'
+          }],
+          path: [{
+            required: true,
+            message: '请上传视频',
+            trigger: 'blur'
+          }]
+        }
       }
     },
     async created() {
@@ -145,22 +188,6 @@
       handleCurrentChange(val) {
         this.listQuery.page = val
         this.getList()
-      },
-      /**
-       * 上传之前的校验
-       * @param file
-       * @returns {boolean}
-       */
-      beforeUploadVideo(file) {
-        const isLt10M = file.size / (1024 * 1024) < 50
-        if (['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb'].indexOf(file.type) === -1) {
-          this.$message.error('请上传正确的视频格式')
-          return false
-        }
-        if (!isLt10M) {
-          this.$message.error('上传视频大小不能超过50MB哦!')
-          return false
-        }
       },
       /**
        * 展示弹窗
@@ -219,9 +246,10 @@
        */
       async uploadSuccess(res) {
         console.log(res)
-        this.$message.success('上传成功')
-        this.dialogVisible = false
-        await this.getList()
+        this.postForm.path = res || ''
+        // this.$message.success('上传成功')
+        // this.dialogVisible = false
+        // await this.getList()
       },
 
       /**
@@ -244,12 +272,55 @@
           duration: 2000
         })
         await this.getList()
+      },
+
+      async saveVideo() {
+        let message = ''
+        const valid = await new Promise((resolve, reject) => {
+          this.$refs.postForm.validate(valid => resolve(valid))
+        })
+        if (!valid) {
+          return
+        }
+        try {
+          if (this.postForm.id) {
+            await updateVideo(this.postForm.id, this.postForm)
+            message = '修改成功'
+          } else {
+            await createVideo(this.postForm)
+            message = '创建成功'
+          }
+          this.$message.success(message)
+          this.closeDialog()
+          await this.getList()
+        } catch (e) {
+          console.log(e)
+          message = '保存失败'
+          this.$message.error(message)
+        }
+      },
+
+      /**
+       * 上传文章封面成功的回调
+       */
+      imageSuccessCBK(path) {
+        this.postForm.imageUrl = path
+      },
+
+      closeDialog() {
+        this.postForm = {
+          id: null,
+          title: '',
+          imageUrl: '',
+          path: ''
+        }
+        this.dialogVisible = false
       }
     }
   }
 </script>
 
-<style scoped>
+<style rel="stylesheet/scss" lang="scss">
   .edit-input {
     padding-right: 100px;
   }
@@ -263,5 +334,17 @@
     position: absolute;
     right: 15px;
     top: 10px;
+  }
+
+  .app-container {
+    .upload-container {
+      .image-uploader {
+        width: 100%;
+      }
+
+      .image-preview {
+        margin-left: 0px;
+      }
+    }
   }
 </style>
