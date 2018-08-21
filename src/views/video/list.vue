@@ -38,10 +38,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" width="160">
+      <el-table-column align="center" label="操作" width="200">
         <template slot-scope="scope">
           <el-button type="primary" size="small" icon="el-icon-caret-right"
                      @click="playVideo(scope.row)" circle
+          ></el-button>
+          <el-button type="primary" size="small" icon="el-icon-edit"
+                     @click="updateVideo(scope.row)" circle
           ></el-button>
           <el-button type="primary" icon="el-icon-check" circle
                      v-if="scope.row.state === 1"
@@ -315,6 +318,11 @@
           path: ''
         }
         this.dialogVisible = false
+      },
+
+      updateVideo(row) {
+        this.postForm = row
+        this.dialogVisible = true
       }
     }
   }
