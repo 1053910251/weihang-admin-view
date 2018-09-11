@@ -44,7 +44,7 @@ export function updateJob(id, param) {
  */
 export function deleteJob(id) {
   return request({
-    url: `/api/tag/${id}`,
+    url: `/api/job/${id}`,
     method: 'delete'
   })
 }
