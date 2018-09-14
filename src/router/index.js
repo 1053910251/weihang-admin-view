@@ -12,6 +12,8 @@ const articleEditComponent = () => import('@/views/article/edit')
 const videoListComponent = () => import('@/views/video/list')
 const JobListComponent = () => import('@/views/job/list')
 const TagListComponent = () => import('@/views/tag/list')
+const ConfigListComponent = () => import('@/views/config/list')
+const LiveVideoComponent = () => import('@/views/config/liveVideoConfig')
 
 // 首页
 const dashboardRoute = {
@@ -169,13 +171,46 @@ const tagRoute = {
   ]
 }
 
+const configListRoute = {
+  path: '/config/list',
+  component: ConfigListComponent,
+  name: 'configList',
+  meta: {
+    title: '配置列表'
+  }
+}
+
+const liveVideoRoute = {
+  path: '/config/liveVideo',
+  component: LiveVideoComponent,
+  name: 'liveVideo',
+  meta: {
+    title: '直播配置'
+  }
+}
+
+const configRoute = {
+  path: '/config',
+  component: LayoutComponent,
+  name: 'config',
+  redirect: '/config/liveVideo',
+  meta: {
+    title: '配置管理'
+  },
+  children: [
+    liveVideoRoute,
+    configListRoute
+  ]
+}
+
 export const routes = [
   dashboardRoute,
   loginRoute,
   articleRoute,
   videoRoute,
   jobRoute,
-  tagRoute
+  tagRoute,
+  configRoute
 ]
 
 const router = new Router({
