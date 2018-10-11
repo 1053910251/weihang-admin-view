@@ -14,6 +14,7 @@ const JobListComponent = () => import('@/views/job/list')
 const TagListComponent = () => import('@/views/tag/list')
 const ConfigListComponent = () => import('@/views/config/list')
 const LiveVideoComponent = () => import('@/views/config/liveVideoConfig')
+const PartnerListComponent = () => import('@/views/config/partner')
 
 // 首页
 const dashboardRoute = {
@@ -189,6 +190,15 @@ const liveVideoRoute = {
   }
 }
 
+const partnerListRoute = {
+  path: '/config/partner',
+  component: PartnerListComponent,
+  name: 'partnerList',
+  meta: {
+    title: '合作伙伴配置'
+  }
+}
+
 const configRoute = {
   path: '/config',
   component: LayoutComponent,
@@ -199,6 +209,7 @@ const configRoute = {
   },
   children: [
     liveVideoRoute,
+    partnerListRoute,
     configListRoute
   ]
 }
