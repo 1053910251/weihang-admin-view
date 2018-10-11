@@ -20,7 +20,7 @@
 
       <el-table-column align="center" label="logo地址">
         <template slot-scope="scope">
-          <span>{{scope.row.imageUrl}}</span>
+          <img :src="scope.row.imageUrl" v-if="scope.row.imageUrl">
         </template>
       </el-table-column>
 
